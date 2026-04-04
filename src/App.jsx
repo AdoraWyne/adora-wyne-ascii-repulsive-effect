@@ -8,14 +8,26 @@ function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const dpr = window.devicePixelRatio || 1;
+    const displayW = 700;
+    const displayH = 200;
+
+    canvas.width = displayW * dpr;
+    canvas.height = displayH * dpr;
+
+    canvas.style.width = displayW + "px";
+    canvas.style.height = displayH + "px";
+
     const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
     ctx.fillStyle = "green";
-    ctx.fillRect(10, 10, 100, 100);
+    ctx.font = "12px monospace";
+    ctx.fillText("Hello Canvas", 10, 70);
   }, []);
 
   return (
     <div>
-      <canvas width="120" height="120" ref={canvasRef}>
+      <canvas ref={canvasRef}>
         An alternative text describing what your canvas displays.
       </canvas>
     </div>
