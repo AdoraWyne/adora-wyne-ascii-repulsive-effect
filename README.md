@@ -1,16 +1,70 @@
-# React + Vite
+# Vibe Code Words Magnetic Repulsive Effect
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## STEP 1: SETUP
 
-Currently, two official plugins are available:
+- create a canvas (700 x 200 pixels)
+- multiply canvas size by devicePixelRatio for sharp rendering
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## STEP 2: BUILD THE STENCIL
 
-## React Compiler
+- draw "adora wyne" in BIG 120px font onto the canvas
+  (this is temporary — we just need the pixel data)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- read ALL pixel data from canvas → gives us [R, G, B, A] for every pixel
 
-## Expanding the ESLint configuration
+- create empty particles list
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- for each pixel (skipping every 5th for performance):
+  - if this pixel has ink (alpha > 128):
+    - create a particle:
+      - homeX, homeY = where this pixel lives
+      - x, y = same as home (starts at home)
+      - vx, vy = 0 (no movement yet)
+      - char = random character from "abc...@#$..."
+    - add particle to list
+
+- clear the canvas (the big text was just a stencil, throw it away)
+
+## STEP 3: ANIMATION LOOP (runs 60x per second)
+
+- every frame:
+  - clear the canvas
+
+  - for each particle:
+    - **FORCE 1: REPULSION**
+    - measure distance from particle to mouse cursor
+    - if distance < 80px:
+      - push particle AWAY from cursor
+      - closer = stronger push (squared falloff)
+
+    - **FORCE 2: SPRING**
+      - pull particle back toward its homeX, homeY
+      - (gentle — only 8% of the gap each frame)
+
+    - **FORCE 3: FRICTION**
+      - multiply velocity by 0.85
+      - (so particles slow down naturally)
+
+    - **UPDATE**
+      - particle.x += particle.vx
+      - particle.y += particle.vy
+
+    - **DRAW**
+      - calculate how far particle is from home
+      - farther from home = more opaque (brighter when scattered)
+      - draw particle.char at particle.x, particle.y
+
+## STEP 4: MOUSE TRACKING
+
+- on mouse move over the card:
+  - store cursor position relative to canvas
+
+- on mouse leave:
+  - set cursor to (-9999, -9999) so no particles are affected
+
+## STEP 5: TEXTURE SHIMMER
+
+- every 300ms:
+  - for each particle:
+    - 3% chance → swap its character for a new random one
+- (this makes the text feel alive, like a screen flickering)
