@@ -1,5 +1,3 @@
-
-https://github.com/user-attachments/assets/31b7486c-7674-49e7-b3b9-380d2873dde3
 # Vibe Code Words Magnetic Repulsive Effect
 
 ## Demo
