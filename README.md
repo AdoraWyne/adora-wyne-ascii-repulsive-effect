@@ -1,8 +1,11 @@
+
+https://github.com/user-attachments/assets/31b7486c-7674-49e7-b3b9-380d2873dde3
 # Vibe Code Words Magnetic Repulsive Effect
 
 ## Demo
 
-<video src="src/assets/demo.mov"></video>
+https://github.com/user-attachments/assets/c18b3a0a-a906-4898-8665-0eb6843c82f0
+
 
 ## STEP 1: SETUP
 
