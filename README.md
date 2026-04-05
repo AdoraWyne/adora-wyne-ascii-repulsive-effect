@@ -1,5 +1,9 @@
 # Vibe Code Words Magnetic Repulsive Effect
 
+## Demo
+
+<video src="src/assets/demo.mov"></video>
+
 ## STEP 1: SETUP
 
 - create a canvas (700 x 200 pixels)
