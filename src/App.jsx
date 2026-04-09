@@ -56,14 +56,19 @@ function App() {
         const alpha = pixels[i + 3]; // the A in RGBA
 
         if (alpha > 128) {
+          const homeX = x / dpr;
+          const homeY = y / dpr;
           particles.push({
-            homeX: x / dpr,
-            homeY: y / dpr,
-            x: x / dpr,
-            y: y / dpr,
+            homeX,
+            homeY,
+            // Start scattered randomly around home position
+            x: homeX + (Math.random() - 0.5) * displayW * 0.5,
+            y: homeY + (Math.random() - 0.5) * displayH * 2.5,
             vx: 0,
             vy: 0,
             char: charPool[Math.floor(Math.random() * charPool.length)],
+            // Stagger delay left-to-right based on x position
+            delay: (homeX / displayW) * 1.2,
           });
         }
       }
@@ -89,8 +94,10 @@ function App() {
     const ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
     let animId;
+    const t0 = performance.now();
 
-    const animate = () => {
+    const animate = (now) => {
+      const elapsed = (now - t0) / 1000; // seconds since mount
       const particles = particlesRef.current;
       const mouse = mouseRef.current;
 
@@ -102,6 +109,16 @@ function App() {
       ctx.textAlign = "center";
 
       for (const p of particles) {
+        // How long since this particle's delay expired
+        const t = Math.max(0, elapsed - p.delay);
+
+        // Not yet active — draw faintly and skip physics
+        if (t < 0.01) {
+          ctx.fillStyle = "rgba(255, 100, 160, 0.05)";
+          ctx.fillText(p.char, p.x, p.y);
+          continue;
+        }
+
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -125,8 +142,9 @@ function App() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Draw
-        ctx.fillStyle = "rgba(255, 100, 160, 0.7)";
+        // Draw — fade in during first 0.8s after delay
+        const alpha = Math.min(t / 0.8, 1) * 0.7;
+        ctx.fillStyle = `rgba(255, 100, 160, ${alpha})`;
         ctx.fillText(p.char, p.x, p.y);
       }
 
