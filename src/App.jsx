@@ -5,6 +5,7 @@ function App() {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const mouseRef = useRef({ x: -9999, y: -9999 });
+  const charSizeRef = useRef(10);
 
   const handleMouseMove = useCallback((e) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -23,9 +24,25 @@ function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
     const dpr = window.devicePixelRatio || 1;
-    const displayW = 700;
-    const displayH = 200;
+
+    // Measure parent width for responsive sizing
+    const displayW = parent.offsetWidth;
+
+    // Scale font to fill the container width
+    const baseFontSize = 120;
+    const tmp = document.createElement("canvas").getContext("2d");
+    tmp.font = `bold ${baseFontSize}px Georgia, serif`;
+    const naturalW = tmp.measureText("adora wyne").width;
+    const scaledFontSize = Math.floor(
+      baseFontSize * (displayW / naturalW) * 0.9,
+    );
+
+    // Derive height from scaled font size
+    const displayH = Math.ceil(scaledFontSize * 1.4);
 
     canvas.width = displayW * dpr;
     canvas.height = displayH * dpr;
@@ -34,9 +51,9 @@ function App() {
     canvas.style.height = displayH + "px";
 
     const ctx = canvas.getContext("2d");
-    ctx.save(); // snapshot the clean state
+    ctx.save();
     ctx.scale(dpr, dpr);
-    ctx.font = "bold 120px Georgia, serif";
+    ctx.font = `bold ${scaledFontSize}px Georgia, serif`;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.fillStyle = "pink";
@@ -47,7 +64,9 @@ function App() {
     const pixels = imageData.data;
 
     const particles = [];
-    const sampleStep = 5;
+    // Scale sample density and char size with the font size
+    const sampleStep = Math.max(2, Math.round(scaledFontSize / 24));
+    const charSize = Math.max(4, Math.round(scaledFontSize / 12));
     const charPool = "abcdefghijklmnopqrstuvwxyz0123456789@#$%&*+=-~:.";
 
     for (let y = 0; y < canvas.height; y += sampleStep) {
@@ -74,8 +93,10 @@ function App() {
       }
     }
 
+    charSizeRef.current = charSize;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "10px 'Courier New', monospace";
+    ctx.font = `${charSize}px 'Courier New', monospace`;
     ctx.fillStyle = "rgba(255, 100, 160, 0.7)";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
@@ -93,6 +114,7 @@ function App() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
+    const charSize = charSizeRef.current;
     let animId;
     const t0 = performance.now();
 
@@ -104,7 +126,7 @@ function App() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       ctx.scale(dpr, dpr);
-      ctx.font = "10px 'Courier New', monospace";
+      ctx.font = `${charSize}px 'Courier New', monospace`;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
 
