@@ -77,7 +77,7 @@ function App() {
       ctx.font = `bold ${scaledFontSize}px Georgia, serif`;
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
-      ctx.fillStyle = "pink";
+      ctx.fillStyle = "#fff";
       ctx.fillText("adora wyne", displayW / 2, displayH / 2);
       ctx.restore();
 
@@ -131,7 +131,7 @@ function App() {
           const t = Math.max(0, elapsed - p.delay);
 
           if (t < 0.01) {
-            ctx.fillStyle = "rgba(255, 100, 160, 0.05)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
             ctx.fillText(p.char, p.x, p.y);
             continue;
           }
@@ -159,7 +159,7 @@ function App() {
           p.y += p.vy;
 
           const a = Math.min(t / 0.8, 1) * 0.7;
-          ctx.fillStyle = `rgba(255, 100, 160, ${a})`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
           ctx.fillText(p.char, p.x, p.y);
         }
 
