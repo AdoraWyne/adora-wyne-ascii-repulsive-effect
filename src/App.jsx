@@ -6,22 +6,28 @@ function App() {
   const particlesRef = useRef([]);
   const mouseRef = useRef({ x: -9999, y: -9999 });
 
-  const handleMouseMove = useCallback((e) => {
+  // Convert screen coordinates to canvas coordinate space
+  const updatePointer = useCallback((clientX, clientY) => {
     const canvas = canvasRef.current;
     const rect = canvas?.getBoundingClientRect();
     if (!rect) return;
-    // Scale from screen space to canvas coordinate space
     const scaleX = canvas.width / (window.devicePixelRatio || 1) / rect.width;
     const scaleY = canvas.height / (window.devicePixelRatio || 1) / rect.height;
     mouseRef.current = {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
     };
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
+  const clearPointer = useCallback(() => {
     mouseRef.current = { x: -9999, y: -9999 };
   }, []);
+
+  const handleMouseMove = useCallback(
+    (e) => updatePointer(e.clientX, e.clientY),
+    [updatePointer],
+  );
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,8 +46,7 @@ function App() {
       clearInterval(shuffleInterval);
 
       const dpr = window.devicePixelRatio || 1;
-      const isMobile = window.innerWidth <= 600;
-      const mouseRadius = isMobile ? 50 : 100;
+      const mouseRadius = 100;
 
       // Measure parent width for responsive sizing
       const displayW = parent.offsetWidth;
@@ -186,7 +191,7 @@ function App() {
   return (
     <div
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={clearPointer}
       style={{
         minHeight: "100vh",
         display: "flex",
