@@ -7,11 +7,15 @@ function App() {
   const mouseRef = useRef({ x: -9999, y: -9999 });
 
   const handleMouseMove = useCallback((e) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    const rect = canvas?.getBoundingClientRect();
     if (!rect) return;
+    // Scale from screen space to canvas coordinate space
+    const scaleX = canvas.width / (window.devicePixelRatio || 1) / rect.width;
+    const scaleY = canvas.height / (window.devicePixelRatio || 1) / rect.height;
     mouseRef.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
     };
   }, []);
 
@@ -36,6 +40,8 @@ function App() {
       clearInterval(shuffleInterval);
 
       const dpr = window.devicePixelRatio || 1;
+      const isMobile = window.innerWidth <= 600;
+      const mouseRadius = isMobile ? 50 : 100;
 
       // Measure parent width for responsive sizing
       const displayW = parent.offsetWidth;
@@ -130,15 +136,15 @@ function App() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           // FORCE 1: Repulsion
-          if (dist < 50 && dist > 0.1) {
+          if (dist < mouseRadius && dist > 0.1) {
             const force = (1 - dist / 80) * (1 - dist / 80) * 50;
             p.vx += (dx / dist) * force;
             p.vy += (dy / dist) * force;
           }
 
           // FORCE 2: Spring back to home
-          p.vx += (p.homeX - p.x) * 0.08;
-          p.vy += (p.homeY - p.y) * 0.08;
+          p.vx += (p.homeX - p.x) * 0.04;
+          p.vy += (p.homeY - p.y) * 0.04;
 
           // FORCE 3: Friction
           p.vx *= 0.85;
